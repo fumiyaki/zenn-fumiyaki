@@ -6,8 +6,8 @@ topics:
   - "テスト"
   - "e2e"
   - "playwright"
-published: false
-published_at: null
+published: true
+published_at: "2023-10-24 09:00"
 publication_name: "overflow_offers"
 ---
 

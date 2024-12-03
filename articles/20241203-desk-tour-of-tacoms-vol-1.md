@@ -63,7 +63,7 @@ https://qiita.com/advent-calendar/2024/tacoms
 
 # 河崎さんのデスク
 
-![](/images/20241203-desk-tour-of-tacoms-vol-1/3-kawasaki-desk.png)
+![](/images/20241203-desk-tour-of-tacoms-vol-1/3-kawasaki-desk.jpg)
 
 ## こだわりポイント
 

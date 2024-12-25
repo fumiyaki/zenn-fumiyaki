@@ -46,7 +46,7 @@ https://qiita.com/advent-calendar/2024/tacoms
 
 # kashima さんのデスク
 
-![](/images/20241224-desk-tour-of-tacoms-vol-2/2-kashima.JPG)
+![](/images/20241224-desk-tour-of-tacoms-vol-2/2-kashima.jpeg)
 
 ## こだわりポイント
 
@@ -92,7 +92,7 @@ saito さんもその中の一人ですね！
 
 # ozawa さんのデスク
 
-![](/images/20241224-desk-tour-of-tacoms-vol-2/5-ozawa.jpg)
+![](/images/20241224-desk-tour-of-tacoms-vol-2/5-ozawa.jpeg)
 
 ## こだわりポイント
 

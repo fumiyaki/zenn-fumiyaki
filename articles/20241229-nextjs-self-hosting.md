@@ -1,39 +1,49 @@
 ---
-title: "2024 年 12 月版 Next.js Self Hosting"
-emoji: "🔍"
+title: "2025年 Next.js Self Hosting"
+emoji: "🌅"
 type: "tech"
 topics:
   - "nextjs"
-  - "self-hosting"
+  - "ecs"
   - "vercel"
   - "render"
   - "opennext"
-published: false
-published_at: "2024-12-29 23:59"
+published: true
 publication_name: "tacoms"
 ---
 
+この zenn の記事 は、tacoms Advent Calendar 2024 の 6 日目です!
+他メンバーの Advent Calendar はこちらからご覧ください！👇
+
+https://qiita.com/advent-calendar/2024/tacoms
+
+それでは tacoms Advent Calendar 2024 の 6 日目の記事スタートです 🫣
+
 ## はじめに
+
+こんにちは！fumiyaki です！
+今回は所属しているコミュニティの [React Tokyo](https://discord.gg/5B9jYpABUy) で『今 React，Next.js をデプロイするならどこがおすすめですか？』というスレッドがあり、そこで盛り上がったため、自分なりに深堀りしてまとめてみました。
+24 年中に公開するつもりでしたが年が明けたので最新っぽいタイトルをつけることが出来ました 🫠
 
 ### 背景
 
-Next.js を本番運用する際、**Vercel を使うのが最も手軽かつ王道**とされています。  
-しかし、コスト面・インフラポリシー・企業セキュリティ要件など様々な理由で、  
-**Self Hosting** を使いたいこともあるでしょう。
+Next.js を本番運用する際、**Vercel を使うのが最も手軽**とされています。
+しかし、コスト面・インフラポリシー・企業セキュリティ要件など様々な理由で、
+**Self Hosting** をする場合もあります。
 
-実際、Next.js のすべての機能が Vercel でしか動かないわけではありません。
 **2024 年のアップデート（[Next.js 14.1](https://nextjs.org/blog/next-14-1#improved-self-hosting) / [15 RC2](https://nextjs.org/blog/next-15-rc2#improvements-for-self-hosting)）** では、Self Hosting で運用する際の **[ドキュメント](https://nextjs.org/docs/app/building-your-application/deploying)** や機能サポートがかなり充実してきました。
+そこで、Next.js を Self Hosting する際の選択肢を整理してみました。
 
 ### この記事のゴール
 
 - **Next.js 14 / 15 の登場で変わった Self Hosting 事情を整理**する
-- **Vercel／[Cloudflare Workers(with OpenNext)](https://opennext.js.org/cloudflare)／[AWS Lambda(with OpenNext)](https://opennext.js.org/aws)／Amazon ECS／Render** などの選択肢を比較検討する
-- 特に **App Router で追加された ４種の Cache、Server Actions** などの最新機能に焦点を当てる
+- **Vercel／[Cloudflare Workers with OpenNext](https://opennext.js.org/cloudflare)／[AWS Lambda with OpenNext](https://opennext.js.org/aws)／Amazon ECS／Render** を比較検討する
+- 特に **App Router で追加された ４種の Caching、Server Actions** などの最新機能に焦点を当てる
 
-本記事は、業務で Next.js を使うフロントエンドエンジニア向けに書かれており、  
-「Vercel が便利なのは知っているけど、社内事情やコストの問題で Vercel 以外のインフラを選択せざるを得ない」という方々へのヒントとなれば幸いです。
+本記事は、業務で Next.js を使うフロントエンドエンジニア向けに書かれており、
+「Vercel が便利なのは分かっているけど、社内の事情やコストの問題で Vercel 以外のインフラを選択せざるを得ない」という方々へのヒントとなれば幸いです。
 
-## Next.js とホスティングの概観
+## Next.js と Hosting
 
 Next.js は以下のような**主要機能**を提供し、フロントエンドの DX を大幅に向上させるフレームワークです。
 
@@ -43,75 +53,81 @@ Next.js は以下のような**主要機能**を提供し、フロントエン�
 - **Server Actions**
 - file-system based router, API Routes, etc. (今回の話では特に扱いません)
 
-### Self Hosting のメリット・デメリット
+### Vercel で Hosting をするメリット
 
-| メリット                                                | デメリット                                                                                 |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| - 自由度が高い (Docker, K8s, ECS,オンプレ等何でも OK)   | - インフラやスケーリングの知識が必要                                                       |
-| - コストコントロールがしやすい (VPS, 社内サーバ等)      | - 運用負荷が高い (モニタリング、デプロイフロー、障害対応を自前で行う必要)                  |
-| - 特殊要件 (厳格なセキュリティ/オンプレ環境) にも対応可 | - Vercel のようなグローバル CDN や自動スケールはないため、必要なら自力で構築する必要がある |
+- Middleware、 Server Actions や `export const runtime = "edge"` と書いた箇所は Edge ランタイム上で動作する
+- スケーリング、CI/CD、モニタリング、障害対応がオールインワンで提供される
+- 複数インスタンスで自動スケーリングしながらキャッシュを共有
 
-### OpenNext, コンテナ, PaaS などの代表的選択肢
+### Self Hosting をするメリット
 
-- **OpenNext(Cloudflare Workers / AWS Lambda)**
+- PaaS, ECS, K8s, オンプレ等何でも OK
+- 好きな機能やサービスをいくらでも組み合わせられる
+- 特殊要件 (厳格なセキュリティ/オンプレ環境) にも対応可能
+- コストコントロールがしやすいことがある
 
+### Self Hosting をするツラミ
+
+- 複数インスタンスでの Cache ハンドリング、CI/CD、モニタリング、障害対応など全て自前で行う必要がある
+- Edge での配信は all or nothing で、一部(例えば Middleware だけ)を Edge に配置することは出来ない
+
+### OpenNext, コンテナ, PaaS の代表的な選択肢
+
+- **OpenNext(AWS Lambda / Cloudflare Workers)**
+
+  - Lambda@Edge では Node ランタイム、Cloudflare Workers では Edge ランタイム上で Next.js を実行する
   - AWS 上で **CloudFront + Lambda@Edge** を組み合わせ、**Vercel ライクなエッジ配信**を再現する OSS
-  - Cloudflare Workers でも同様にエッジロケーションでコードを実行できる。
+  - Cloudflare Workers でも同様に Edge ロケーションでコードを実行できる。
 
 - **コンテナ(Amazon ECS)**
 
-  - Docker コンテナをデプロイする方式
-  - 全て自前でリバースプロキシ、スケーリング、キャッシュなどを管理・設定
+  - Docker コンテナの Node ランタイム上で Next.js を実行する
+  - 全て自前でリバースプロキシ、スケーリング、キャッシュなども管理・設定可能
 
 - **PaaS(Render)**
 
-  - Node.js アプリとして Next.js をデプロイできる PaaS
-  - Dockerized も可能。Redis や RDB 等も同じ管理画面でセットアップしやすい
+  - PaaS の Node ランタイム上で Next.js を実行する
+  - 負荷増時のスケーリングは手動・自動を選択可能
+  - RDB や Redis 等も管理画面でセットアップしやすい
 
-「**自社でどこまで手動管理するか**」と「**クラウドが肩代わりしてくれるか**」のバランス次第で、これらの選択肢を検討することになります。
+「**自前でどこまで管理するか**」と「**サービスにどこまで肩代わりしてもらうか**」のバランスを検討することになります。
 
-## Node Runtime と Edge Runtime
+## Node ランタイムと Edge ランタイム
 
-Next.js アプリケーションを実行する際、大きく分けて **Node ランタイム** と **Edge ランタイム** という 2 つの実行形態があります。
-Edge ランタイムは Node ランタイムより**軽量かつ制限された** 環境（Vercel Edge Functions や Cloudflare Workers など）です。
+少し横道に逸れますが、Next.js アプリケーションを実行する際、**Node ランタイム** と **Edge ランタイム** という 2 つの実行形態があります。
+Edge ランタイムは Node ランタイムより**軽量かつ制限された** 環境になります。
 
 ### Node ランタイム
 
-- **従来の Node.js 上で Next.js サーバーを起動**し、`next start` や `node server.js` 等で実行する
-- `fs` や `crypto` など **標準の Node.js API** をフルに使える
-- Middleware など一部機能は Edge Runtime を想定しているが、Node ランタイム上でも**Edge Runtime 互換**として動作する
-- Self Hosting は多くの場合、この Node ランタイムで運用するパターンが主流
-
-| メリット                                                              | デメリット                                                    |
-| --------------------------------------------------------------------- | ------------------------------------------------------------- |
-| ほぼ全ての npm パッケージが動作 (`fs`, `path`, `child_process`, etc.) | ランタイムが大きく、起動/メモリ消費が Edge Runtime より大きい |
+- Node ランタイム上で `next start` や `node server.js` 等で Next.js サーバーを起動する
+- `fs`, `path`, `child_process`, `crypto` など **標準の Node API** をフルに使える
+- ほぼ全ての npm パッケージが動作
+- Middleware など一部機能は Edge ランタイムを想定しているが、Node ランタイム上でも**Edge ランタイム互換**としてちゃんと動作する
+- Self Hosting の多くは Node ランタイムで運用するパターンが主流
+- デメリットとしてはランタイムが大きく、起動/メモリ消費が Edge ランタイムより大きい
 
 ### Edge ランタイム
 
-- **Vercel Edge Functions** や **Cloudflare Workers** など、グローバルに配置されたエッジサーバレス環境
-- **「Node.js のサブセット」** とされる制限付きのランタイム
-  - `fs` や `child_process` などは使えない
-- **高速なコールドスタート** でグローバルな分散デプロイが可能
-- Next.js では **Middleware** がこの Edge Runtime を想定。さらに Server Components のストリーミング等で低レイテンシの恩恵を受けやすい
+- **Vercel の Edge** や **Cloudflare Workers** などはグローバルに配置された Edge サーバレス環境に分散デプロイが可能で、レスポンスが高速
+- **高速なコールドスタート** が可能
+- Next.js では **Middleware** がこの Edge ランタイムを想定。さらに **Server Components のストリーミング** では低レイテンシの恩恵を受けやすい
+- デメリットとしては Node.js のサブセットとされる制限付きのランタイムなので`fs` や `child_process` などは使えない
+- それらを使った npm パッケージも動作しない
 
-| メリット                                                              | デメリット                                               |
-| --------------------------------------------------------------------- | -------------------------------------------------------- |
-| 世界中のエッジロケーションで超高速レスポンス (コールドスタートは極小) | 一部 Node API 非対応 (`fs`, `net`, `child_process` など) |
+### Node ランタイムと Edge ランタイムのまとめ
 
-### Node Runtime と Edge Runtime のまとめ
-
-- **Node ランタイム** は互換性や自由度が高く、Self Hosting でも一番わかりやすい選択肢。
-- **Edge ランタイム** は超高速起動と世界中への分散配置で、特に `Middleware` と組み合わせると強力だが、API 制限に注意。
-- **一部の Next.js 機能 (Middleware, Server Actions など)** で Edge Runtime が推奨される場合もあるが、Node ランタイムでも“エミュレート”して動くパターンがほとんど。
+- **Node ランタイム** は互換性や自由度が高く、Self Hosting でも一番分かりやすい選択肢。
+- **Edge ランタイム** は高速起動と世界中へ分散デプロイされるので、特に `Middleware` や `Streaming` と相性が良いが、API の制限に注意。
+- **一部の Next.js 機能 (Middleware, Streaming, 他にも Server Actions など)** で Edge ランタイムが推奨される場合もあるが、Node ランタイムでも“エミュレート”して動くパターンがほとんど。
 
 ## Next.js 14 / 15 で強化された Self Hosting 機能
 
 ### 1. App Router まわりのキャッシュ戦略・改善
 
-App Router では **Request Memoization / Data Cache / Full Route Cache / Router Cache** を組み合わせたキャッシュ戦略が可能になりました。  
+App Router では **Request Memoization / Data Cache / Full Route Cache / Router Cache** を組み合わせたキャッシュ戦略が可能になりました。
 しかし複数インスタンス構成の場合、**デフォルトのファイルキャッシュやインメモリキャッシュ**だけでは整合性が保てず、Vercel のようにスケールアウトしにくいのが課題です。
 
-そこで Next.js 14.1 では、**`cacheHandler`** オプションが正式安定化しました。  
+そこで Next.js 14.1 では、**`cacheHandler`** オプションが正式安定化しました。
 たとえば以下の設定をすると、Next.js のデフォルトキャッシュを無効化し、**外部ストレージ (Redis 等) を通じてキャッシュを永続化**できます。
 
 ```js
@@ -123,106 +139,80 @@ module.exports = {
 ```
 
 :::message
-cache-handler.js に、Redis や Memcached などを使って **同じキャッシュキー** に読み書きするロジックを実装する必要があります。
+cache-handler.js に、Redis や Memcached などを使って **同じキャッシュキー** に読み書きするロジックを実装する必要があります。[^1]
 :::
 
 この設定を組み合わせると、複数サーバーでも同じキャッシュを共有でき、Vercel に近いスケーリングを自前で構成できます。
 
 ### 2. 画像最適化の改善 (Sharp / WebAssembly)
 
-Next.js 12.3 リリース前後あたりから、WebAssembly フォールバック (`@squoosh/lib`の独自拡張) が導入され、Sharp がインストールされていなくても画像最適化が可能となりました。[^1]
-しかしパフォーマンス面から Sharp が推奨されていたのですが、**Next.js 15 以降では Sharp が自動インストールされるようになり**、
-特に何もしなくても Sharp が使われる形に進化しています。
+Next.js 12.3 リリース前後あたりから、WebAssembly フォールバック (`@squoosh/lib`の独自拡張) が導入され、Sharp がインストールされていなくても画像最適化が可能となりました。[^2]
+しかしパフォーマンス面から Sharp が推奨されていたのですが、**Next.js 15 以降では Sharp が自動インストールされるようになり**、特に何もしなくても Sharp が使われる形に進化しました。
 
-これによって、Self Hosting する場合でもセットアップが不要になり、ビルド手順がシンプルになりました。
+これによって、Self Hosting する場合でも画像最適化のためのセットアップが不要になり、ビルド手順がシンプルになりました。
 
-また、WASM フォールバックも引き続き残っているので、環境によっては Sharp が使えない場合でも自動的に WASM にフォールバックしてくれます。
+また、WASM フォールバックも引き続き残っているので、環境の問題によって Sharp が使えない場合でも自動的に WASM にフォールバックしてくれます。
 
-### 3. Middleware (Edge Runtime) の自前ホスト対応
+### 3. Middleware の改善
 
-Next.js 14.1 のリリースで Edge Runtime を想定していた Middleware が Node.js 環境でも動作するようになりました。
+Next.js 14.1 のリリースで Edge ランタイムを想定していた Middleware が **Node.js 環境でも動作する** ようになりました。
 
-Self Hosting をして複数リージョンでエッジ配信したい場合は、Nginx や CloudFront + Lambda@Edge 等の追加構築が必要になります。
+Vercel のように複数リージョンでエッジ配信したい場合は、Nginx や CloudFront + Lambda@Edge 等の追加構築が必要になります。
 
-### 4. Runtime environment variables
+### 4. Runtime Environment Variables
 
-Next.js 14 以降、self-hosting 時の環境変数管理に関するドキュメントも強化されました。
-process.env.\* で読み込み、Docker や ECS の環境変数にマッピングする形が一般的です。
-Vercel のように専用 UI は提供されないため、.env ファイル管理や CI/CD パイプラインでの注入などを自力で設計しましょう。
-
-(この先は「Vercel / Self Hosting / Render / OpenNext の比較」や「おさらい」「まとめ」などへ繋げていただき、
-本稿を完成させてください。上記の点を踏まえれば、Next.js を Self Hosting する際に必要となる知見や注意点を
-ひととおり把握できる内容になるはずです。)
+Next.js は **ビルド時** と **ランタイム時** の両方で環境変数を扱えます。
+クライアント側に埋め込む場合は **`NEXT_PUBLIC_`** が必須ですが、これはビルド後の JavaScript に直接書き込まれる点に注意が必要です。
+一方、サーバーコンポーネントが `process.env.*` を参照する場合は、Docker や ECS の起動時に設定した値を実行中に読み込めます。[^3]
+Self Hosting では `.env` ファイル管理や CI/CD の注入などを自力で行い、Vercel のような専用 UI はありませんが、同じコンテナでも環境変数を差し替えて動かせるメリットがあります。
 
 ### その他 Self Hosting で動作するか気になる機能
 
 #### 5. Streaming (Server Components + Suspense)
 
-Next.js の App Router では、Server Components + Suspense を使ってレスポンスをチャンク単位で送るストリーミングが可能です。  
+Next.js の App Router では、Server Components + Suspense を使ってレスポンスをチャンク単位で送るストリーミングが可能です。
 セルフホスティングでも、**Node.js 上で `next start`** している限り特別な設定は不要で、段階的にコンテンツを返せます。
 
-ただし、**Nginx** などリバースプロキシ経由の場合、レスポンスをまとめて返す設定があるとストリーミングのメリットが得られません。  
-必要に応じてバッファリングを無効化すると Vercel 同様に段階表示による高速なユーザー体験を提供できます。
+ただし、**Nginx などのリバースプロキシ経由の場合** はレスポンスをまとめて返す設定があるとストリーミングはされません。
+必要に応じてバッファリングを無効化すると、段階的な表示による高速な UX を提供できます。
 
 #### 6. Server Actions
 
-**Server Actions** は、フォーム送信や簡単な API 呼び出しをサーバーコンポーネント内で扱える機能です。  
-**Vercel 固有**ではなく **Next.js 本体の機能** なので、Self Hosting (Node.js)でも特別な設定なしに動作します。  
-ただし、**Edge 環境** で使う場合は、注意が必要です。
-現状は OpenNext のアダプタが最新の仕様に対応しているか要確認です。[^2]
+Server Actions は、フォーム送信や簡単な API 呼び出しをサーバーコンポーネント内で扱える機能です。
+**Vercel 固有**ではなく **Next.js 本体の機能** なので、Self Hosting (Node ランタイム)でも特別な設定なしに動作します。
 
 ## Vercel / Self Hosting / Render / OpenNext の比較
 
-### 共通点と相違点
-
-表形式で「キャッシュ機能」「スケーリング」「Edge 配信」「デプロイの簡単さ」「コスト」などを比較
-
-- Vercel
-  - Next.js を最も簡単にデプロイできる
-  - グローバル CDN, Edge Functions, ISR キャッシュを自動管理
-  - カスタムキャッシュはやや冗長か
-- Self Hosting
-  - 完全自由。Docker/K8s/ECS などインフラ構成はお好み
-  - Custom Cache Handler + Redis で大規模スケール対応可能
-  - 運用・学習コスト高
-- Render
-  - “Node.js として Next.js をホスティング” …PaaS 的サービス
-  - Redis や DB を同じ管理画面でセットアップ可能
-  - Edge Functions のようなグローバル分散はなし
-- OpenNext
-  - AWS 上で CloudFront + Lambda@Edge を組み合わせて “Vercel ライクな” エッジ配信を目指す OSS
-  - ただし Next.js の最新機能への追随や運用面での継続サポートに留意
-- ECS
-  - 画像最適化
-  - Middleware
-  - Server Actions
-  - Runtime environment variables
+ここでは Next.js を本番運用する際の代表的な選択肢を、いくつかの観点で比較してみます。
+| | **Vercel** | **OpenNext** | **Amazon ECS** | **Render** |
+|-----------------------|------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| **デプロイの簡単さ** | - Git 連携だけでデプロイ可能<br>- CI/CD が標準搭載<br>- Preview も標準搭載| - デフォルト設定で AWS/Cloudflare のリソースを自動配置してくれるので比較的簡単<br>- ただし **AWS のデプロイに時間がかかる** | - プロダクションレベルだと AWS アーキ設計や詳細な設定が必要<br>- 自前で CI/CD を組む必要がある | - Git 連携だけでデプロイ可能<br>- CI/CD が標準搭載<br>- Preview も標準搭載 |
+| **スケーリング** | 自動スケール | 自動スケール | - **ECS / Fargate + ALB** などで柔軟にスケール<br>- SRE 力 💪 | - 手動/動的スケールが選択可能 |
+| **Edge 配信** | - Middleware が Edge で動作<br>- ServerActions や Streaming も Edge で動作 | - **CloudFront + Lambda@Edge** で Web アプリをエッジで配信可能<br>- 但し**Streaming と Edge 配置の併用は現状出来なかった** | - ECS を Edge には置けないため考慮外<br>- 将来 Middleware が Next.js 本体から分離出来れば Middleware だけ CloudFront+Lambda@Edge におけるかも(願望) | 単一リージョンでの運用 |
+| **キャッシュ機能** | Full 機能標準搭載 | デフォルトで S3 や DynamoDB など**AWS リソースへの Cache 連携**が簡単 | - 自前で Redis 等を用意して CacheHandler の実装が必要<br>- CloudFront や ALB レイヤー含めて全体の Cache の調整が必要 | 自前で Redis 等を用意して CacheHandler の実装が必要 |
+| **デプロイの柔軟性** | - **Vercel 独自インフラ**に縛られる<br>- ほぼ設定不要でラク | - AWS / Cloudflare の サービス連携が前提<br>- **OSS** なので自由度は高いがバージョン追随が必要 | - **VPC, SG, ALB** 等を自由に組み合わせ可能<br>- AWS 全般の豊富なオプションがある反面、**設定と保守**はユーザ負担 | PaaS なので AWS などよりはシンプルだが，自由度も少なくなる |
+| **運用負荷** | - Vercel がオールインワン管理<br>- モニタリング等も専用 UI | - サーバレス × エッジで大規模に強い<br>- 周辺サービス (S3, DynamoDB etc.) の理解が必要<br>- OpenNext のアップデート追随が必要 | - インフラ周りを自力で構築<br>- モニタリング, ログ, デプロイフローも作ればある | CI/CD は自動 |
+| **コスト/趣味用 (小〜中規模)** | - **Hobby プラン** (無料枠あり)<br>- ビルド回数や帯域などに制限<br>- 個人ブログや社内ツールなら十分 | - AWS / Cloudflare の無料枠を超えると課金<br>- トラフィックが少なければ月数ドル程度 | - ECS / EC2 の無料枠は基本的に無い<br>- **ライトな構成**にしても$10〜30/月はかかる<br>- 運用規模が小さいならそもそも ECS 選択のメリットが薄い | - Hobby プラン: $0/月あり<br> - 小規模なら無料インスタンスで始められる<br> - Starter レベルのビルド/帯域が含まれるが超過すると課金が発生 |
+| **コスト/実運用 (中〜大規模)** | - **Pro/Enterprise プラン**<br>- リクエスト数や帯域に応じて**従量課金**が発生<br>- トラフィックの多いサイトだと数百〜数千ドル/月になる | - AWS / Cloudflare の利用に応じた課金<br>- 大量アクセス時は従量課金が急増しやすいので注意 | - **EC2 / Fargate / ALB**等の AWS 課金<br>- 大規模なら数百〜数千ドル/月も珍しくない | - Professional: $19/人/月 + 従量課金<br> - 組織向け: $29/人/月 + 従量課金 |
 
 ## おさらい
 
-- 「Next.js 15 から Vercel と同じ機能を全部自前で再現できる？」
-  - 大部分の機能は自前で再現しやすくなったが、Edge ネットワークを含むグローバル配信などは別物
+- 「Next.js 15 から Vercel と同じ機能を全部自前で再現できるの？」
+  - **Next.js の主要機能は自前で再現しやすくなった**が、Edge 配信などの最適化を自前で構築することは不可能
 - 「Custom Next.js Cache Handler を使わないといけないの？」
-  - 複数サーバー・複数インスタンス構成でキャッシュを共有する場合はほぼ必須
-- 「Middleware / Edge Runtime は Node API 使えない？」
-  - Edge Runtime は本質的にサーバレス的 Web APIs なので一部制限がある
-- 「Server Actions などの新しい機能 は Vercel じゃないとダメ？」
-  - Next.js の機能かが重要
-  - 例えば Server Actions は Next.js の機能で Node.js プロセスで動作するので Self Hosting でも問題なく動く
+  - **複数サーバー・複数インスタンス構成**でキャッシュを共有する場合はほぼ必須。単一インスタンスの場合はデフォルトのファイル/インメモリキャッシュで十分戦える。
+- 「Middleware では Node API は使えないの？」
+  - Middleware は Node ランタイムでも動作可能になりはしたが、依然として Edge ランタイムを想定していて build 時に Edge ランタイム想定のコードに変換されるため Node API は使えない。
+- 「Server Actions は Vercel じゃないと動かないの？」
+  - Server Actions は**Next.js 本体の機能**です。**Self Hosting (Node.js)** でも問題なく動きます。
 
 ## まとめ
 
-Next.js 14/15 で Self Hosting が一気にやりやすくなったが、Vercel が提供するグローバルエッジ配信・自動スケールなどは依然として強み
-プロジェクトの要件 (コスト, 運用負荷, グローバル展開, リクエスト量) に応じて Vercel / Self-hosting / Render / OpenNext などの選択肢を検討する
-今後さらに Self-hosting 向け機能が強化される見込み。キャッシュ戦略や運用設計をしっかり組み立てることで、Vercel に頼らずとも高度な Next.js サイトを構築可能になってきている
+Next.js 14 / 15 で Self Hosting しやすくなりました。しかし、Vercel が提供する**グローバルへの Edge 配信**や４種のキャッシュハンドリングなどは依然として強みがあります。
+プロジェクトの要件 (コスト, 運用負荷, グローバル展開, リクエスト量) に応じて **Vercel / OpenNext / Container / PaaS** などの技術を選択しましょう。
 
-## 参考リンク / 参考リポジトリ
-
-- Next.js Official Docs（Self-Hosting）
-- OpenNext GitHub
-- Neshca (カスタムキャッシュハンドラの例)
-- 公式例: Next.js Custom Cache Handler Example
-- Render ドキュメント (Next.js Deploy)
+今後のアップデートでも Self Hosting 向けの機能に力を入れていくと予想され、**Custom Cache Handler**をはじめ、これからも大きく改善されていくと思います。
+キャッシュ戦略やインフラ設計を組み立てれば、**Vercel に頼らず**とも大規模な Next.js サイトを運用できるようになってきていると言えるでしょう。
 
 ## PR
 
@@ -233,11 +223,12 @@ https://www.tacoms-inc.com/recruit
 
 ## PR2
 
-React Tokyo というコミュニティが出来ました 🙌
+[React Tokyo](https://discord.gg/5B9jYpABUy) というコミュニティが出来ました 🙌
 詳しくは[こちらの記事](https://zenn.dev/dai_shi/articles/9f2760086fb31a)に書かれていますが，もし React に興味あるよ，好きだよという方は是非ご参加ください 🙌
 1 月はオフラインイベントもありますよ＼(^o^)／
 
 以上！
 
-[^1]: 残念ながらどこで導入されたか見つけることが出来ませんでした 🙏ChatGPT に聞いて 12.3 と強く言い張るのでここでは 12.3 としています
-[^2]: 実際に試した方が居たら教えてください 🙏
+[^1]: [akfm_sato](https://x.com/akfm_sato) さんの書かれた『[Custom Next.js Cache Handler - Vercel 以外での Next.js キャッシュ活用](https://zenn.dev/akfm/articles/nextjs-cache-handler-redis)』を参考にしてください
+[^2]: 残念ながらどこで導入されたか見つけることが出来ませんでした 🙏ChatGPT に聞いて 12.3 と強く言い張るのでここでは 12.3 としています
+[^3]: 実行中に環境変数を読む方法は[ドキュメント](https://nextjs.org/docs/app/building-your-application/deploying#environment-variables)を参考にしてください

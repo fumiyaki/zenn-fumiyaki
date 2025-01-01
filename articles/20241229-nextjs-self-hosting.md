@@ -24,6 +24,7 @@ https://qiita.com/advent-calendar/2024/tacoms
 こんにちは！fumiyaki です！
 今回は所属しているコミュニティの [React Tokyo](https://discord.gg/5B9jYpABUy) で『今 React，Next.js をデプロイするならどこがおすすめですか？』というスレッドがあり、そこで盛り上がったため、自分なりに深堀りしてまとめてみました。
 24 年中に公開するつもりでしたが年が明けたので最新っぽいタイトルをつけることが出来ました 🫠
+不完全ではありますが[リポジトリ](https://github.com/fumiyaki/nextjs-self-hosting)も公開したので、参考にしてください
 
 ### 背景
 

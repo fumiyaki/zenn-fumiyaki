@@ -46,7 +46,7 @@ React に関する LT も行われます！
 
 https://speakerdeck.com/calloc134/reactnonei-bu-gou-zao-wozhi-tuteoku-react-tokyo-number-6-at-calloc134
 
-かろっくさんの発表で React の内部構造について Deep Dive する内容でした 🤿
+[かろっく](https://x.com/calloc134)さんの発表で React の内部構造について Deep Dive する内容でした 🤿
 Discord や x でアイコンと名前は知っていたのですが、まさか学生さんだったとは驚きでした笑
 
 スライドにかわいい図がたくさんあってかわいいスライドでした。
@@ -72,24 +72,30 @@ Discord や x でアイコンと名前は知っていたのですが、まさか
 ## LT1
 
 ![](/images/20250623-react-tokyo-event-report/05LT1.JPG)
-晴れ井戸さんの発表で JSX（インターフェース）について熱いぽえむが聞けました 🙌
+[晴れ井戸](https://x.com/pal4de)さんの発表で JSX（インターフェース）について熱いぽえむが聞けました 🙌
 XHP という記法が JSX のふるさと？という過去の話から JSX の未来について学びが多かったです 🖌️
+
+https://speakerdeck.com/pal4de/jsx-li-shi-wozhen-rifan-ri-gatute-emokunarou
 
 ## LT2
 
 ![](/images/20250623-react-tokyo-event-report/06LT2.JPG)
-akfm さんの発表で DataLoader のすゝめ。
+[akfm_sato](https://x.com/akfm_sato)さんの発表で DataLoader のすゝめ。
 DataLoader はいいぞぉ、バッチングで待って N+１っぽいやつを解決するという話。
 x(1)
 x(2)
 と書いて x([1,2])で送るのと同等の挙動になるらしいです（詳しくは[akfm さんの zenn の記事](https://zenn.dev/akfm/articles/desing-of-data-fetching)を確認してください 🙏）
 
+https://akifumisato.github.io/slide-of-react-with-dataloader-202506/1
+
 ## LT3
 
 ![](/images/20250623-react-tokyo-event-report/07LT3.JPG)
-林原さんの React における MRAH 設計のススメ。
+[Ahoxa](https://x.com/4h0xa)さんの React における MRAH 設計のススメ。
 MRAH は Modular, Rendering, Adaptive, Hydration の頭文字らしいです！
 特にハイドレーションについて詳しく解説されていました 🚿
+
+https://speakerdeck.com/ahoxa/reatcniokerumrahshe-ji-nosusume
 
 ## 交流会
 

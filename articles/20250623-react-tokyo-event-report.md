@@ -29,13 +29,13 @@ React に関する LT も行われます！
 今回は 6 度目の開催で、参加者は約 40 名でした。
 ![](/images/20250623-react-tokyo-event-report/01.jpeg)
 
-## 会場スポンサー LT 　[株式会社タイミー様](https://timee.co.jp/)
+## 会場スポンサー LT 　[株式会社タイミー様](https://corp.timee.co.jp/)
 
 ![](/images/20250623-react-tokyo-event-report/02.jpeg)
 オフラインイベントを応援していて、コミュニティを大切にしたいと話していました！
 会場も貸してますよー！とのことです（今回はありがとうございます！）
 
-## 飲食スポンサー LT 　[ロスカ株式会社様](https://rosca.jp/)
+## 飲食スポンサー LT 　[ROSCA 株式会社様](https://rosca.jp/)
 
 ![](/images/20250623-react-tokyo-event-report/03.jpeg)
 
@@ -88,7 +88,7 @@ x(2)
 
 https://akifumisato.github.io/slide-of-react-with-dataloader-202506/1
 
-## LT3: Reatc における MRAH 設計のススメ
+## LT3: React における MRAH 設計のススメ
 
 ![](/images/20250623-react-tokyo-event-report/07LT3.jpeg)
 [Ahoxa](https://x.com/4h0xa)さんの React における MRAH 設計のススメ。
@@ -109,7 +109,7 @@ https://speakerdeck.com/ahoxa/reatcniokerumrahshe-ji-nosusume
 久々に React Tokyo のイベントに参加して React にまつわる話がたくさん出来て楽しかったです。
 オンライン・オフラインどちらも継続して盛り上げていきたいので皆さんも是非たくさんご参加ください！
 
-イベント開催にあたり、会場、飲食のご支援を頂きました[株式会社タイミー](https://timee.co.jp/)様、[ロスカ株式会社](https://rosca.jp/)様、そして日頃よりコミュニティをご支援いただいているコミュニティスポンサーの株式会社[キッカケクリエイション](https://kikkakecreation.com/)様、[Dress Code 株式会社](https://www.dress-code.com/)様、[株式会社 Rebase](https://www.rebase.co.jp/)様、 [株式会社カケハシ](https://www.kakehashi.life/)様、誠にありがとうございました。
+イベント開催にあたり、会場、飲食のご支援を頂きました[株式会社タイミー](https://corp.timee.co.jp/)様、[ROSCA 株式会社](https://rosca.jp/)様、そして日頃よりコミュニティをご支援いただいているコミュニティスポンサーの株式会社[キッカケクリエイション](https://kikkakecreation.com/)様、[Dress Code 株式会社](https://www.dress-code.com/)様、[株式会社 Rebase](https://www.rebase.co.jp/)様、 [株式会社カケハシ](https://www.kakehashi.life/)様、株式会社 [ALGO ARTIS](https://www.algo-artis.com/)様、[MOSH 株式会社](https://careers2025.mosh.jp/)様、誠にありがとうございました。
 そして運営をサポートしてくださった、React Tokyo サポートチームの皆様、本当にありがとうございました。
 
 React Tokyo では、今後もオンライン・オフラインでのイベントを企画していきます。

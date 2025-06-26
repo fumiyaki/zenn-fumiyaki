@@ -6,7 +6,7 @@ topics:
   - "react"
   - "イベントレポート"
   - "reacttokyo"
-published: false
+published: true
 publication_name: "react_tokyo"
 ---
 
